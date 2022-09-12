@@ -13,6 +13,11 @@ import {
 import { toast } from "react-toastify";
 import Web3 from "web3";
 import Web3EthContract from "web3-eth-contract";
+import mainNftAbi from "../config/contract/main_nft_abi.json";
+import subNftAbi from "../config/contract/sub_nft_abi.json";
+
+const mainNftAddress = "0x93Ff8004866456A2711F6F0Cf181c762889426D9";
+const subNftAddress = "0x6FE13069719516460030883e27edD3F088dcb536";
 
 export default function Index() {
   const [address, setAddress] = React.useState("");
@@ -58,6 +63,11 @@ export default function Index() {
         const web3Instance = new Web3(ethereum);
         Web3EthContract.setProvider(ethereum);
         setWeb3(web3Instance);
+        const mainContract = new Web3EthContract(mainNftAbi, mainNftAddress);
+        const subContract = new Web3EthContract(subNftAbi, subNftAddress);
+
+        setMnftContract(mainContract);
+        setSnftContract(subContract);
 
         const result = await ethereum.request({ method: "eth_accounts" });
         if (result) {
@@ -72,6 +82,26 @@ export default function Index() {
       console.error(error);
     }
   };
+
+  const mintMainNft = React.useCallback(() => {
+    console.log(address);
+    mnftContract.methods
+      .safeMint(address)
+      .send({ from: "0x4cA938d7643ae303C32dFaDBddAeaFa182261263" })
+      .on("receipt", function () {
+        console.log("init");
+      });
+  }, [address, mnftContract, web3]);
+
+  const mintSubNft = React.useCallback(() => {
+    console.log(address);
+    snftContract.methods
+      .safeMint(address)
+      .send({ from: "0x4cA938d7643ae303C32dFaDBddAeaFa182261263" })
+      .on("receipt", function () {
+        console.log("init");
+      });
+  }, [address, snftContract, web3]);
 
   return (
     <Container maxWidth="sm">
@@ -98,7 +128,30 @@ export default function Index() {
             <Typography variant="h6">Mint Main NFT</Typography>
           </CardContent>
           <CardActions>
-            <Button onClick={() => {}} variant="contained" size="small">
+            <Button
+              onClick={mintMainNft}
+              variant="contained"
+              size="small"
+              type="button"
+            >
+              Mint
+            </Button>
+          </CardActions>
+        </Card>
+        <Typography variant="h3" align="center" gutterBottom>
+          ↓
+        </Typography>
+        <Card variant="outlined">
+          <CardContent>
+            <Typography variant="h6">Mint Sub NFT</Typography>
+          </CardContent>
+          <CardActions>
+            <Button
+              onClick={mintSubNft}
+              variant="contained"
+              size="small"
+              type="button"
+            >
               Mint
             </Button>
           </CardActions>
