@@ -16,8 +16,8 @@ import Web3EthContract from "web3-eth-contract";
 import mainNftAbi from "../config/contract/main_nft_abi.json";
 import subNftAbi from "../config/contract/sub_nft_abi.json";
 
-const mainNftAddress = "0x93Ff8004866456A2711F6F0Cf181c762889426D9";
-const subNftAddress = "0x6FE13069719516460030883e27edD3F088dcb536";
+const mainNftAddress = "0x3de404ce30369b0163b5807ef2b310f6087ca0ce";
+const subNftAddress = "0x21c9537fd90924ab15c1c354e3d51e801e7338b6";
 
 export default function Index() {
   const [address, setAddress] = React.useState("");
@@ -83,24 +83,45 @@ export default function Index() {
     }
   };
 
-  const mintMainNft = React.useCallback(() => {
-    console.log(address);
-    mnftContract.methods
-      .safeMint(address)
-      .send({ from: "0x4cA938d7643ae303C32dFaDBddAeaFa182261263" })
-      .on("receipt", function () {
-        console.log("init");
-      });
+  const mintMainNft = React.useCallback(async () => {
+    try {
+      mnftContract.methods
+        .mint(1)
+        .send({
+          from: address,
+        })
+        .once("error", (err, receipt) => {
+          console.debug(receipt);
+          toast.error(err.message.toLowerCase());
+        })
+        .then((receipt) => {
+          console.debug(receipt);
+          toast("Main NFT minted");
+        });
+    } catch (err) {
+      console.error(err);
+      toast.error(err.message.toLowerCase());
+    }
   }, [address, mnftContract, web3]);
 
-  const mintSubNft = React.useCallback(() => {
-    console.log(address);
-    snftContract.methods
-      .safeMint(address)
-      .send({ from: "0x4cA938d7643ae303C32dFaDBddAeaFa182261263" })
-      .on("receipt", function () {
-        console.log("init");
-      });
+  const mintSubNft = React.useCallback(async () => {
+    try {
+      snftContract.methods
+        .mint(1)
+        .send({
+          from: address,
+        })
+        .once("error", (err, receipt) => {
+          console.debug(receipt);
+          toast.error(err.message.toLowerCase());
+        })
+        .then((receipt) => {
+          console.debug(receipt);
+          toast("Sub NFT minted");
+        });
+    } catch (err) {
+      toast.error(err.message.toLowerCase());
+    }
   }, [address, snftContract, web3]);
 
   return (
@@ -120,45 +141,46 @@ export default function Index() {
             </Button>
           </CardActions>
         </Card>
-        <Typography variant="h3" align="center" gutterBottom>
-          ↓
-        </Typography>
-        <Card variant="outlined">
-          <CardContent>
-            <Typography variant="h6">Mint Main NFT</Typography>
-          </CardContent>
-          <CardActions>
-            <Button
-              onClick={mintMainNft}
-              variant="contained"
-              size="small"
-              type="button"
-            >
-              Mint
-            </Button>
-          </CardActions>
-        </Card>
-        <Typography variant="h3" align="center" gutterBottom>
-          ↓
-        </Typography>
-        <Card variant="outlined">
-          <CardContent>
-            <Typography variant="h6">Mint Sub NFT</Typography>
-          </CardContent>
-          <CardActions>
-            <Button
-              onClick={mintSubNft}
-              variant="contained"
-              size="small"
-              type="button"
-            >
-              Mint
-            </Button>
-          </CardActions>
-        </Card>
-        <Typography variant="h3" align="center" gutterBottom>
-          ↓
-        </Typography>
+        {address !== "" && (
+          <>
+            <Typography variant="h3" align="center" gutterBottom>
+              ↓
+            </Typography>
+            <Card variant="outlined">
+              <CardContent>
+                <Typography variant="h6">Mint Main NFT</Typography>
+              </CardContent>
+              <CardActions>
+                <Button
+                  onClick={mintMainNft}
+                  variant="contained"
+                  size="small"
+                  type="button"
+                >
+                  Mint
+                </Button>
+              </CardActions>
+            </Card>
+            <Typography variant="h3" align="center" gutterBottom>
+              ↓
+            </Typography>
+            <Card variant="outlined">
+              <CardContent>
+                <Typography variant="h6">Mint Sub NFT</Typography>
+              </CardContent>
+              <CardActions>
+                <Button
+                  onClick={mintSubNft}
+                  variant="contained"
+                  size="small"
+                  type="button"
+                >
+                  Mint
+                </Button>
+              </CardActions>
+            </Card>
+          </>
+        )}
       </Box>
     </Container>
   );
